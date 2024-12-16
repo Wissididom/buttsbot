@@ -2,7 +2,14 @@ import "dotenv/config";
 import { buttifiable, buttify } from "./buttify.js";
 import crypto from "crypto";
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
+import {
+  authCallback,
+  chatterAuth,
+  streamerAndChatterAuth,
+  streamerAuth,
+} from "./auth.js";
 
 const app = express();
 
@@ -103,6 +110,8 @@ async function getToken() {
   }
 }
 
+app.use(rateLimit());
+
 app.use(helmet());
 
 app.use(
@@ -111,7 +120,35 @@ app.use(
   }),
 );
 
-app.get("/", (req, res) => res.send("Twitch EventSub Webhook Endpoint"));
+app.get("/", (req, res) => {
+  res.send("buttsbot");
+});
+
+app.get("/streamer-auth", (req, res) => {
+  streamerAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/chatter-auth", (req, res) => {
+  chatterAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/streamer-and-chatter-auth", (req, res) => {
+  streamerAndChatterAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/auth-callback", authCallback);
 
 app.post("/", async (req, res) => {
   let secret = process.env.EVENTSUB_SECRET;
