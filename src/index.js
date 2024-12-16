@@ -2,6 +2,7 @@ import "dotenv/config";
 import { buttifiable, buttify } from "./buttify.js";
 import crypto from "crypto";
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import {
   authCallback,
@@ -108,6 +109,8 @@ async function getToken() {
     return token;
   }
 }
+
+app.use(rateLimit());
 
 app.use(helmet());
 
