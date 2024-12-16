@@ -122,11 +122,13 @@ function redirect(res, clientId, redirectUri, scopes) {
 }
 
 app.get("/streamer-auth", (req, res) => {
-  redirect(res, process.env.TWITCH_CLIENT_ID, "TODO", ["channel:bot"]);
+  redirect(res, process.env.TWITCH_CLIENT_ID, process.env.TWTICH_REDIRECT_URI, [
+    "channel:bot",
+  ]);
 });
 
 app.get("/chatter-auth", (req, res) => {
-  redirect(res, process.env.TWITCH_CLIENT_ID, "TODO", [
+  redirect(res, process.env.TWITCH_CLIENT_ID, process.env.TWTICH_REDIRECT_URI, [
     "user:read:chat",
     "user:write:chat",
     "user:bot",
@@ -134,7 +136,7 @@ app.get("/chatter-auth", (req, res) => {
 });
 
 app.get("/streamer-and-chatter-auth", (req, res) => {
-  redirect(res, process.env.TWITCH_CLIENT_ID, "TODO", [
+  redirect(res, process.env.TWITCH_CLIENT_ID, process.env.TWTICH_REDIRECT_URI, [
     "channel:bot",
     "user:read:chat",
     "user:write:chat",
@@ -180,7 +182,7 @@ app.get("/auth-callback", async (req, res) => {
         client_secret: process.env.TWITCH_CLIENT_SECRET,
         code: authCode,
         grant_type: "authorization_code",
-        redirect_uri: "TODO",
+        redirect_uri: process.env.TWTICH_REDIRECT_URI,
       }),
     });
     if (fetchResponse.ok) {
