@@ -110,7 +110,7 @@ async function getToken() {
   }
 }
 
-app.use(rateLimit());
+const limiter = rateLimit();
 
 app.use(helmet());
 
@@ -124,7 +124,7 @@ app.get("/", (req, res) => {
   res.send("buttsbot");
 });
 
-app.get("/streamer-auth", (req, res) => {
+app.get("/streamer-auth", limiter, (req, res) => {
   streamerAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
@@ -132,7 +132,7 @@ app.get("/streamer-auth", (req, res) => {
   );
 });
 
-app.get("/chatter-auth", (req, res) => {
+app.get("/chatter-auth", limiter, (req, res) => {
   chatterAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
@@ -140,7 +140,7 @@ app.get("/chatter-auth", (req, res) => {
   );
 });
 
-app.get("/streamer-and-chatter-auth", (req, res) => {
+app.get("/streamer-and-chatter-auth", limiter, (req, res) => {
   streamerAndChatterAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
