@@ -1,3 +1,13 @@
+import { getUser as getUserImpl } from "./utils.js";
+
+async function getUser(
+  id,
+  clientId = process.env.TWITCH_CLIENT_ID,
+  accessToken,
+) {
+  return getUserImpl(id, clientId, accessToken);
+}
+
 function redirect(res, clientId, redirectUri, scopes) {
   res.redirect(
     `https://id.twitch.tv/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${encodeURIComponent(scopes.join(" "))}`,
@@ -67,9 +77,13 @@ export async function authCallback(req, res) {
       }),
     });
     if (fetchResponse.ok) {
-      const json = fetchResponse.json();
+      const json = await fetchResponse.json();
       const accessToken = json.access_token;
-      const user = getUser(null, process.env.TWITCH_CLIENT_ID, accessToken);
+      const user = await getUser(
+        null,
+        process.env.TWITCH_CLIENT_ID,
+        accessToken,
+      );
       const forWhom = getForWhom(json.scope);
       if (user.display_name.toLowerCase() == user.login) {
         res.send(`Got Tokens for ${forWhom} ${user.display_name}`);
@@ -79,7 +93,7 @@ export async function authCallback(req, res) {
         );
       }
     } else {
-      res.send(fetchResponse.text());
+      res.send(await fetchResponse.text());
     }
   } else if (req.query.error) {
     if (req.query.error_description) {

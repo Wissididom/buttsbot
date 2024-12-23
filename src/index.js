@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { getUser as getUserImpl } from "./utils.js";
 import { buttifiable, buttify } from "./buttify.js";
 import crypto from "crypto";
 import express from "express";
@@ -73,16 +74,7 @@ async function getUser(
   clientId = process.env.TWITCH_CLIENT_ID,
   accessToken = token.access_token,
 ) {
-  let apiUrl = id
-    ? `https://api.twitch.tv/helix/users?id=${id}`
-    : `https://api.twitch.tv/helix/users`;
-  let userResponse = await fetch(apiUrl, {
-    headers: {
-      "Client-ID": clientId,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).then((res) => res.json());
-  return userResponse.data[0];
+  return getUserImpl(id, clientId, accessToken);
 }
 
 async function getToken() {
