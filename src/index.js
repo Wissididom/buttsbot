@@ -1,8 +1,16 @@
 import "dotenv/config";
+import { getUser as getUserImpl } from "./utils.js";
 import { buttifiable, buttify } from "./buttify.js";
 import crypto from "crypto";
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
+import {
+  authCallback,
+  chatterAuth,
+  streamerAndChatterAuth,
+  streamerAuth,
+} from "./auth.js";
 
 const app = express();
 
@@ -66,16 +74,7 @@ async function getUser(
   clientId = process.env.TWITCH_CLIENT_ID,
   accessToken = token.access_token,
 ) {
-  let apiUrl = id
-    ? `https://api.twitch.tv/helix/users?id=${id}`
-    : `https://api.twitch.tv/helix/users`;
-  let userResponse = await fetch(apiUrl, {
-    headers: {
-      "Client-ID": clientId,
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).then((res) => res.json());
-  return userResponse.data[0];
+  return getUserImpl(id, clientId, accessToken);
 }
 
 async function getToken() {
@@ -103,6 +102,8 @@ async function getToken() {
   }
 }
 
+const limiter = rateLimit();
+
 app.use(helmet());
 
 app.use(
@@ -111,7 +112,35 @@ app.use(
   }),
 );
 
-app.get("/", (req, res) => res.send("Twitch EventSub Webhook Endpoint"));
+app.get("/", (req, res) => {
+  res.send("buttsbot");
+});
+
+app.get("/streamer-auth", limiter, (req, res) => {
+  streamerAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/chatter-auth", limiter, (req, res) => {
+  chatterAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/streamer-and-chatter-auth", limiter, (req, res) => {
+  streamerAndChatterAuth(
+    res,
+    process.env.TWITCH_CLIENT_ID,
+    process.env.TWTICH_REDIRECT_URI,
+  );
+});
+
+app.get("/auth-callback", authCallback);
 
 app.post("/", async (req, res) => {
   let secret = process.env.EVENTSUB_SECRET;
