@@ -120,7 +120,7 @@ app.get("/streamer-auth", limiter, (req, res) => {
   streamerAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
-    process.env.TWTICH_REDIRECT_URI,
+    process.env.TWITCH_REDIRECT_URI,
   );
 });
 
@@ -128,7 +128,7 @@ app.get("/chatter-auth", limiter, (req, res) => {
   chatterAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
-    process.env.TWTICH_REDIRECT_URI,
+    process.env.TWITCH_REDIRECT_URI,
   );
 });
 
@@ -136,7 +136,7 @@ app.get("/streamer-and-chatter-auth", limiter, (req, res) => {
   streamerAndChatterAuth(
     res,
     process.env.TWITCH_CLIENT_ID,
-    process.env.TWTICH_REDIRECT_URI,
+    process.env.TWITCH_REDIRECT_URI,
   );
 });
 
