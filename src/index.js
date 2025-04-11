@@ -42,7 +42,7 @@ async function sendMessage(broadcasterId, senderId, message) {
     broadcaster_id: broadcasterId,
     sender_id: senderId,
     message,
-    for_source_only: false,
+    for_source_only: true,
   };
   console.log(`sendMessage:${JSON.stringify(data)}`);
   return await fetch("https://api.twitch.tv/helix/chat/messages", {
