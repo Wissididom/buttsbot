@@ -42,6 +42,8 @@ async function sendMessage(broadcasterId, senderId, message) {
     broadcaster_id: broadcasterId,
     sender_id: senderId,
     message,
+    for_source_only:
+      process.env.FOR_SOURCE_ONLY?.trim()?.toLowerCase() == "true",
   };
   console.log(`sendMessage:${JSON.stringify(data)}`);
   return await fetch("https://api.twitch.tv/helix/chat/messages", {
