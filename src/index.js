@@ -38,6 +38,7 @@ let token = {
 };
 
 async function sendMessage(broadcasterId, senderId, message) {
+  await getToken(); // Make sure token is valid
   let data = {
     broadcaster_id: broadcasterId,
     sender_id: senderId,
@@ -80,6 +81,9 @@ async function getUser(
 }
 
 async function getToken() {
+  if (token.expires_at > Math.floor(Date.now() / 1000)) {
+    return token; // Skip handling, token should still be valid
+  }
   let clientCredentials = await fetch(
     `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
     {
@@ -88,9 +92,11 @@ async function getToken() {
   );
   if (clientCredentials.status >= 200 && clientCredentials.status < 300) {
     let clientCredentialsJson = await clientCredentials.json();
+    let d = Math.floor(Date.now() / 1000) + clientCredentialsJson.expires_in;
     token = {
       access_token: clientCredentialsJson.access_token,
       expires_in: clientCredentialsJson.expires_in,
+      expires_at: d,
       token_type: clientCredentialsJson.token_type,
       user: token.user
         ? token.user
@@ -100,6 +106,7 @@ async function getToken() {
             clientCredentialsJson.access_token,
           ),
     };
+    console.log("Got new token! Expires at:", new Date(d * 1000));
     return token;
   }
 }
@@ -254,10 +261,6 @@ function verifyMessage(hmac, verifySignature) {
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, async () => {
+app.listen(port, () => {
   console.log(`Server ready on port ${port}.`);
-  await getToken();
-  setTimeout(async () => {
-    await getToken();
-  }, token.expires_in);
 });
