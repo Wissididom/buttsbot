@@ -163,6 +163,7 @@ app.post("/", async (req, res) => {
 
   if (verifyMessage(hmac, req.headers[TWITCH_MESSAGE_SIGNATURE])) {
     // Get JSON object from body, so you can process the message.
+    if (!token.user) await getToken();
     let notification = JSON.parse(req.body);
     switch (req.headers[MESSAGE_TYPE]) {
       case MESSAGE_TYPE_NOTIFICATION:
