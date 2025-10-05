@@ -204,9 +204,17 @@ app.post("/", async (req, res) => {
                     process.env.SENDER_ID,
                     response.emoji,
                   );
+                  res.sendStatus(204);
                   break;
                 }
               }
+            }
+          }
+          const ignoreRegex = process.env.IGNORE_REGEX;
+          if (ignoreRegex) {
+            if (new RegExp(ignoreRegex).test(msg)) {
+              res.sendStatus(204);
+              break;
             }
           }
           if (
