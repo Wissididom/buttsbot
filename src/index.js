@@ -213,6 +213,7 @@ app.post("/", async (req, res) => {
           const ignoreRegex = process.env.IGNORE_REGEX;
           if (ignoreRegex) {
             if (new RegExp(ignoreRegex).test(msg)) {
+              console.log(`Ignored: ${msg}`);
               res.sendStatus(204);
               break;
             }
