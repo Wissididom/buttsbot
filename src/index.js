@@ -168,6 +168,17 @@ app.post("/", async (req, res) => {
     switch (req.headers[MESSAGE_TYPE]) {
       case MESSAGE_TYPE_NOTIFICATION:
         if (notification.subscription.type == "channel.chat.message") {
+          const ignoreNonSource =
+            process.env.IGNORE_NON_SOURCE?.trim()?.toLowerCase() == "true";
+          if (
+            ignoreNonSource &&
+            notification.event.source_broadcaster_user_id &&
+            notification.event.source_broadcaster_user_id !==
+              notification.event.broadcaster_user_id
+          ) {
+            res.sendStatus(204);
+            break;
+          }
           let msg = notification.event.message.text;
           let lowercaseMsg = msg.toLowerCase();
           if (
